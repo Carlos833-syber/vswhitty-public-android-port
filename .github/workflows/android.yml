@@ -27,6 +27,8 @@ jobs:
         with:
           # Recent command-line tools require Java 17; this version supports Java 11.
           cmdline-tools-version: '8512546'
+          packages: platform-tools
+          log-accepted-android-sdk-licenses: false
       - name: Install Android toolchain
         run: sdkmanager 'platforms;android-33' 'build-tools;30.0.3' 'ndk;21.4.7075529'
       - name: Install Haxe libraries

@@ -1,10 +1,17 @@
+name: Android source checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
 jobs:
-  build:
-    runs-on: [ubuntu-latest, macos-latest]
+  check:
+    runs-on: ubuntu-22.04
     steps:
+      - uses: actions/checkout@v4
       - uses: krdlab/setup-haxe@v1
         with:
-          haxe-version: 4.0.5
-      - run: |
-          haxe -version
-          haxelib install hxnodejs
+          haxe-version: 4.2.5
+      - name: Check mobile source formatting and setup script
+        run: |
+          haxelib install formatter 1.16.0 --quiet
+          haxelib run formatter --check -s source/MobileControls.hx
+          bash -n scripts/setup-android.sh
