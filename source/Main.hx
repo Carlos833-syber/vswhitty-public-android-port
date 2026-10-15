@@ -29,8 +29,7 @@ class Main extends Sprite
 
 	public static function main():Void
 	{
-
-		// quick checks 
+		// quick checks
 
 		Lib.current.addChild(new Main());
 	}
@@ -85,7 +84,6 @@ class Main extends Sprite
 		fpsCounter = new FPS(10, 3, 0xFFFFFF);
 		addChild(fpsCounter);
 		toggleFPS(FlxG.save.data.fps);
-
 		#end
 	}
 
@@ -93,18 +91,21 @@ class Main extends Sprite
 
 	var fpsCounter:FPS;
 
-	public function toggleFPS(fpsEnabled:Bool):Void {
-		fpsCounter.visible = fpsEnabled;
+	public function toggleFPS(fpsEnabled:Bool):Void
+	{
+		if (fpsCounter != null)
+			fpsCounter.visible = fpsEnabled;
 	}
 
 	public function changeFPSColor(color:FlxColor)
 	{
-		fpsCounter.textColor = color;
+		if (fpsCounter != null)
+			fpsCounter.textColor = color;
 	}
 
 	public function setFPSCap(cap:Float)
 	{
-		openfl.Lib.current.stage.frameRate = cap;
+		openfl.Lib.current.stage.frameRate = cap >= 30 ? cap : 60;
 	}
 
 	public function getFPSCap():Float
@@ -114,6 +115,6 @@ class Main extends Sprite
 
 	public function getFPS():Float
 	{
-		return fpsCounter.currentFPS;
+		return fpsCounter == null ? getFPSCap() : Math.max(1, fpsCounter.currentFPS);
 	}
 }

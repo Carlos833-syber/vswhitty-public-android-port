@@ -21,14 +21,11 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
-import io.newgrounds.NG;
 import lime.app.Application;
 import openfl.Assets;
-
 #if windows
 import Discord.DiscordClient;
 #end
-
 #if cpp
 import sys.thread.Thread;
 #end
@@ -54,8 +51,8 @@ class TitleState extends MusicBeatState
 		#if polymod
 		polymod.Polymod.init({modRoot: "mods", dirs: ['introMod']});
 		#end
-		
-		#if sys
+
+		#if desktop
 		if (!sys.FileSystem.exists(Sys.getCwd() + "/assets/replays"))
 			sys.FileSystem.createDirectory(Sys.getCwd() + "/assets/replays");
 		#end
@@ -64,16 +61,17 @@ class TitleState extends MusicBeatState
 		{
 			trace("Loaded " + openfl.Assets.getLibrary("default").assetsLoaded + " assets (DEFAULT)");
 		}
-		
+
 		PlayerSettings.init();
+		MobileControls.install();
 
 		#if windows
 		DiscordClient.initialize();
 
-		Application.current.onExit.add (function (exitCode) {
+		Application.current.onExit.add(function(exitCode)
+		{
 			DiscordClient.shutdown();
-		 });
-		 
+		});
 		#end
 
 		curWacky = FlxG.random.getObject(getIntroTextShit());
@@ -179,7 +177,7 @@ class TitleState extends MusicBeatState
 		// logoBl.color = FlxColor.BLACK;
 
 		gfDance = new FlxSprite(FlxG.width * 0.55, FlxG.height * 0.07);
-		gfDance.frames = Paths.getSparrowAtlas('whittyDanceTitle','shared');
+		gfDance.frames = Paths.getSparrowAtlas('whittyDanceTitle', 'shared');
 		gfDance.animation.addByPrefix('dance', 'Whitty Dancing Beat', 30, false);
 		gfDance.antialiasing = true;
 		add(gfDance);
@@ -292,7 +290,7 @@ class TitleState extends MusicBeatState
 
 		if (pressedEnter && !transitioning && skippedIntro)
 		{
-			#if !switch
+			#if (newgrounds && !switch)
 			NGio.unlockMedal(60960);
 
 			// If it's Friday according to da clock
@@ -310,10 +308,8 @@ class TitleState extends MusicBeatState
 
 			new FlxTimer().start(2, function(tmr:FlxTimer)
 			{
-
 				// Get current version of Kade Engine
 				FlxG.switchState(new MainMenuState());
-
 			});
 			// FlxG.sound.play(Paths.music('titleShoot'), 0.7);
 		}
