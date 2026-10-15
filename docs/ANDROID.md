@@ -8,10 +8,10 @@ nos ports mobile da Psych Engine; não é uma migração para a Psych Engine.
 1. No GitHub, abra **Actions → Android APK → Run workflow** e selecione a branch
    que contém este port. Pushes em `main` e `coderabbit/**` também compilam.
 2. Aguarde o job `build` terminar com sucesso.
-3. Baixe o artifact **VS-Whitty-Android-arm64-debug**, extraia o ZIP e instale o APK.
+3. Baixe o artifact **VS-Whitty-Android-debug**, extraia o ZIP e instale o APK.
 
 O APK de testes é assinado com a chave de debug do runner. Requer Android 6+
-(API 23) em aparelho ARM64. Não é um pacote de publicação na Play Store.
+(API 23) em aparelho ARM de 32 ou 64 bits. Não é um pacote de publicação na Play Store.
 A chave de debug pode mudar entre builds: se houver conflito de assinatura,
 será necessário desinstalar o APK anterior (isso remove os dados salvos).
 
@@ -38,7 +38,7 @@ bash scripts/setup-android.sh
 export ANDROID_SETUP=true
 export ANDROID_SDK="$ANDROID_HOME"
 export ANDROID_NDK_ROOT="$ANDROID_HOME/ndk/21.4.7075529"
-haxelib run lime build android -debug -DHXCPP_ARM64
+haxelib run lime build android -debug
 ```
 
 Replays em arquivos e mods externos via Polymod ficam restritos ao desktop.
@@ -50,3 +50,14 @@ Após uma compilação bem-sucedida no Actions, testar: entrada na tela inicial,
 Story/Freeplay, diálogos do Whitty, acordes, sustains, pausa/retomada, retry,
 game over, upscroll/downscroll, middlescroll ligado/desligado e hitboxes
 visíveis/invisíveis. Fechar e reabrir para conferir as preferências.
+
+## Integridade das bibliotecas nativas
+
+O Lime seleciona ARMv7 e ARM64 separadamente durante o build. Não passe
+`-DHXCPP_ARM64` globalmente: nessa versão do Lime isso também força o build da
+pasta `armeabi-v7a` a produzir ELF de 64 bits, impedindo a abertura em Android
+de 32 bits.
+
+Antes do upload, o workflow executa `scripts/check-apk-abis.py` e verifica o
+cabeçalho ELF de cada biblioteca dentro do APK. A pasta `armeabi-v7a` deve
+conter ELF32/ARM e `arm64-v8a` deve conter ELF64/AArch64.

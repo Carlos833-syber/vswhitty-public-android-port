@@ -39,11 +39,13 @@ jobs:
         run: |
           export ANDROID_SDK="$ANDROID_HOME"
           export ANDROID_NDK_ROOT="$ANDROID_HOME/ndk/21.4.7075529"
-          haxelib run lime build android -debug -DHXCPP_ARM64 -DHXCPP_COMPILE_THREADS=2
+          haxelib run lime build android -debug -DHXCPP_COMPILE_THREADS=2
+      - name: Verify native libraries in APK
+        run: python3 scripts/check-apk-abis.py export/debug/android/bin/app/build/outputs/apk/debug/*.apk
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: VS-Whitty-Android-arm64-debug
+          name: VS-Whitty-Android-debug
           path: export/debug/android/bin/app/build/outputs/apk/debug/*.apk
           if-no-files-found: error
           retention-days: 14

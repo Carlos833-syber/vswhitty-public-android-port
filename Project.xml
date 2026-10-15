@@ -12,6 +12,7 @@
 	<section if="android">
 		<app title="VS Whitty" file="VSWhitty" packageName="com.carlos833.whitty" package="com.carlos833.whitty" />
 		<config:android minimum-sdk-version="23" target-sdk-version="33" build-sdk-version="33" build-tools-version="30.0.3" gradle-version="6.7.1" gradle-plugin="4.2.2" />
+		<architecture name="armv7" />
 		<architecture name="arm64" />
 	</section>
 	<!-- <app preloader="Preloader" resizable="true" /> -->

@@ -15,3 +15,4 @@ jobs:
           haxelib install formatter 1.16.0 --quiet
           haxelib run formatter --check -s source/MobileControls.hx
           bash -n scripts/setup-android.sh
+          python3 -m unittest discover -s tests -p "test_*.py"
