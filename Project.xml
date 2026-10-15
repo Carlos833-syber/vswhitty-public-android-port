@@ -33,7 +33,9 @@
 	<window if="desktop" orientation="landscape" fullscreen="false" resizable="true" vsync="false"/>
 
 	<!--Mobile-specific-->
-	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" resizable="false"/>
+	<window if="mobile" orientation="landscape" fullscreen="true" width="0" height="0" fps="60" resizable="false"/>
+	<!-- The debug APK must dispatch errors to the in-app crash reporter. -->
+	<define name="openfl-enable-handle-error" if="android" />
 
 	<!--Switch-specific-->
 	<window if="switch" orientation="landscape" fullscreen="true" width="0" height="0" resizable="true" />

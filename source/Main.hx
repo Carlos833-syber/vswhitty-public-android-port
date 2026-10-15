@@ -29,9 +29,19 @@ class Main extends Sprite
 
 	public static function main():Void
 	{
-		// quick checks
-
+		#if android
+		MobileCrashReporter.install();
+		try
+		{
+			Lib.current.addChild(new Main());
+		}
+		catch (error:Dynamic)
+		{
+			MobileCrashReporter.report(error);
+		}
+		#else
 		Lib.current.addChild(new Main());
+		#end
 	}
 
 	public function new()

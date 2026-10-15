@@ -14,5 +14,12 @@ jobs:
         run: |
           haxelib install formatter 1.16.0 --quiet
           haxelib run formatter --check -s source/MobileControls.hx
+          haxelib run formatter --check -s source/MobileCrashReporter.hx
+          haxelib run formatter --check -s tests/MobileStartupSmoke.hx
           bash -n scripts/setup-android.sh
           python3 -m unittest discover -s tests -p "test_*.py"
+      - name: Check mobile startup in a virtual display
+        run: |
+          bash scripts/setup-android.sh
+          haxelib run lime build linux -neko -debug -Dmobile -DFLX_NO_DEBUG -Dopenfl-enable-handle-error
+          python3 scripts/check-mobile-startup.py

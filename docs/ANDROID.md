@@ -61,3 +61,30 @@ de 32 bits.
 Antes do upload, o workflow executa `scripts/check-apk-abis.py` e verifica o
 cabeçalho ELF de cada biblioteca dentro do APK. A pasta `armeabi-v7a` deve
 conter ELF32/ARM e `arm64-v8a` deve conter ELF64/AArch64.
+
+## Tela preta ou fechamento na abertura
+
+A janela mobile precisa de `fps="60"` desde a criação, antes do preloader e da
+tela inicial. O FPS vazio do projeto original gera `frameRate: null` no Lime;
+no teste local a janela não avança para a tela inicial com essa configuração.
+
+O APK Android habilita o tratamento de exceções também em debug. Erros Haxe
+mostram um diálogo **VS Whitty - erro**, com a mensagem e a pilha de chamadas;
+fotografe a mensagem antes de fechá-la. Uma cópia fica em `last-crash.txt` no
+armazenamento interno do app. O jogo encerra após o diálogo, pois não é seguro
+continuar uma execução com erro.
+
+Esse diálogo não captura falhas Java, sinais nativos ou encerramentos por falta
+de memória. Se o app ainda fechar sem mensagem, será necessário o registro do
+Android. Com ADB conectado, reproduza o fechamento e execute:
+
+```bash
+adb logcat -b crash -d > whitty-crash.txt
+```
+
+Anexe `whitty-crash.txt` junto do modelo do aparelho e da versão do Android.
+
+O workflow de verificações também executa `tests/MobileStartupSmoke.hx` com
+Neko e Xvfb. Ele exige que o preloader avance, que a arte do título carregue
+e que a câmera dos controles mobile exista. É uma verificação de lógica de
+inicialização em Linux; o teste do APK no Android continua necessário.
