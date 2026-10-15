@@ -17,7 +17,6 @@ import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 
-
 class PauseSubState extends MusicBeatSubstate
 {
 	var grpMenuShit:FlxTypedGroup<Alphabet>;
@@ -27,7 +26,7 @@ class PauseSubState extends MusicBeatSubstate
 
 	var pauseMusic:FlxSound;
 	var perSongOffset:FlxText;
-	
+
 	var offsetChanged:Bool = false;
 
 	var includeSkip:Bool = false;
@@ -35,11 +34,11 @@ class PauseSubState extends MusicBeatSubstate
 	public function new(x:Float, y:Float)
 	{
 		super();
-		
+
 		#if !debug
-		menuItems = ['Resume','Restart Song', 'Exit to menu'];
+		menuItems = ['Resume', 'Restart Song', 'Exit to menu'];
 		#end
-		
+
 		pauseMusic = new FlxSound().loadEmbedded(Paths.music('breakfast'), true, true);
 		pauseMusic.volume = 0;
 		pauseMusic.play(false, FlxG.random.int(0, Std.int(pauseMusic.length / 2)));
@@ -77,12 +76,17 @@ class PauseSubState extends MusicBeatSubstate
 
 		grpMenuShit = new FlxTypedGroup<Alphabet>();
 		add(grpMenuShit);
-		perSongOffset = new FlxText(5, FlxG.height - 18, 0, "Additive Offset (Left, Right): " + PlayState.songOffset + " - Description - " + 'Adds value to global offset, per song.', 12);
+		perSongOffset = new FlxText(5, FlxG.height
+			- 18, 0,
+			"Additive Offset (Left, Right): "
+			+ PlayState.songOffset
+			+ " - Description - "
+			+ 'Adds value to global offset, per song.', 12);
 		perSongOffset.scrollFactor.set();
 		perSongOffset.setFormat("VCR OSD Mono", 16, FlxColor.WHITE, LEFT, FlxTextBorderStyle.OUTLINE, FlxColor.BLACK);
-		
-		#if cpp
-			add(perSongOffset);
+
+		#if windows
+		add(perSongOffset);
 		#end
 
 		for (i in 0...menuItems.length)
@@ -95,7 +99,7 @@ class PauseSubState extends MusicBeatSubstate
 
 		changeSelection();
 
-		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
+		cameras = [MobileControls.lastGameCamera()];
 	}
 
 	override function update(elapsed:Float)
@@ -116,66 +120,73 @@ class PauseSubState extends MusicBeatSubstate
 		if (upP)
 		{
 			changeSelection(-1);
-   
-		}else if (downP)
+		}
+		else if (downP)
 		{
 			changeSelection(1);
 		}
-		
-		#if cpp
-			else if (leftP)
+
+		#if windows
+		else if (leftP)
+		{
+			oldOffset = PlayState.songOffset;
+			PlayState.songOffset -= 1;
+			sys.FileSystem.rename(songPath + oldOffset + '.offset', songPath + PlayState.songOffset + '.offset');
+			perSongOffset.text = "Additive Offset (Left, Right): "
+				+ PlayState.songOffset
+				+ " - Description - "
+				+ 'Adds value to global offset, per song.';
+
+			// Prevent loop from happening every single time the offset changes
+			if (!offsetChanged)
 			{
-				oldOffset = PlayState.songOffset;
-				PlayState.songOffset -= 1;
-				sys.FileSystem.rename(songPath + oldOffset + '.offset', songPath + PlayState.songOffset + '.offset');
-				perSongOffset.text = "Additive Offset (Left, Right): " + PlayState.songOffset + " - Description - " + 'Adds value to global offset, per song.';
+				grpMenuShit.clear();
 
-				// Prevent loop from happening every single time the offset changes
-				if(!offsetChanged)
+				menuItems = ['Restart Song', 'Exit to menu'];
+
+				for (i in 0...menuItems.length)
 				{
-					grpMenuShit.clear();
-
-					menuItems = ['Restart Song', 'Exit to menu'];
-
-					for (i in 0...menuItems.length)
-					{
-						var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
-						songText.isMenuItem = true;
-						songText.targetY = i;
-						grpMenuShit.add(songText);
-					}
-
-					changeSelection();
-
-					cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
-					offsetChanged = true;
+					var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
+					songText.isMenuItem = true;
+					songText.targetY = i;
+					grpMenuShit.add(songText);
 				}
-			}else if (rightP)
-			{
-				oldOffset = PlayState.songOffset;
-				PlayState.songOffset += 1;
-				sys.FileSystem.rename(songPath + oldOffset + '.offset', songPath + PlayState.songOffset + '.offset');
-				perSongOffset.text = "Additive Offset (Left, Right): " + PlayState.songOffset + " - Description - " + 'Adds value to global offset, per song.';
-				if(!offsetChanged)
-				{
-					grpMenuShit.clear();
 
-					menuItems = ['Restart Song', 'Exit to menu'];
+				changeSelection();
 
-					for (i in 0...menuItems.length)
-					{
-						var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
-						songText.isMenuItem = true;
-						songText.targetY = i;
-						grpMenuShit.add(songText);
-					}
-
-					changeSelection();
-
-					cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
-					offsetChanged = true;
-				}
+				cameras = [MobileControls.lastGameCamera()];
+				offsetChanged = true;
 			}
+		}
+		else if (rightP)
+		{
+			oldOffset = PlayState.songOffset;
+			PlayState.songOffset += 1;
+			sys.FileSystem.rename(songPath + oldOffset + '.offset', songPath + PlayState.songOffset + '.offset');
+			perSongOffset.text = "Additive Offset (Left, Right): "
+				+ PlayState.songOffset
+				+ " - Description - "
+				+ 'Adds value to global offset, per song.';
+			if (!offsetChanged)
+			{
+				grpMenuShit.clear();
+
+				menuItems = ['Restart Song', 'Exit to menu'];
+
+				for (i in 0...menuItems.length)
+				{
+					var songText:Alphabet = new Alphabet(0, (70 * i) + 30, menuItems[i], true, false);
+					songText.isMenuItem = true;
+					songText.targetY = i;
+					grpMenuShit.add(songText);
+				}
+
+				changeSelection();
+
+				cameras = [MobileControls.lastGameCamera()];
+				offsetChanged = true;
+			}
+		}
 		#end
 
 		if (accepted)
@@ -189,24 +200,24 @@ class PauseSubState extends MusicBeatSubstate
 				case "Restart Song":
 					FlxG.resetState();
 				case "FUCKFUCKFUCK":
-								var difficulty:String = "";
-				
-								if (PlayState.storyDifficulty == 0)
-									difficulty = '-easy';
-				
-								if (PlayState.storyDifficulty == 2)
-									difficulty = '-hard';
-				
-								PlayState.storyPlaylist.remove(PlayState.storyPlaylist[0]);
+					var difficulty:String = "";
 
-								trace('LOADING NEXT SONG');
-								trace(PlayState.storyPlaylist[0].toLowerCase() + difficulty);
-				
-								PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0]);
-								FlxG.sound.music.stop();
-								PlayState.weekSong++;
-								
-								FlxG.switchState(new PlayState());
+					if (PlayState.storyDifficulty == 0)
+						difficulty = '-easy';
+
+					if (PlayState.storyDifficulty == 2)
+						difficulty = '-hard';
+
+					PlayState.storyPlaylist.remove(PlayState.storyPlaylist[0]);
+
+					trace('LOADING NEXT SONG');
+					trace(PlayState.storyPlaylist[0].toLowerCase() + difficulty);
+
+					PlayState.SONG = Song.loadFromJson(PlayState.storyPlaylist[0].toLowerCase() + difficulty, PlayState.storyPlaylist[0]);
+					FlxG.sound.music.stop();
+					PlayState.weekSong++;
+
+					FlxG.switchState(new PlayState());
 				case "Exit to menu":
 					PlayState.loadRep = false;
 					#if windows
@@ -217,7 +228,7 @@ class PauseSubState extends MusicBeatSubstate
 					}
 					#end
 					if (FlxG.save.data.fpsCap > 290)
-						(cast (Lib.current.getChildAt(0), Main)).setFPSCap(290);
+						(cast(Lib.current.getChildAt(0), Main)).setFPSCap(290);
 					FlxG.switchState(new MainMenuState());
 			}
 		}

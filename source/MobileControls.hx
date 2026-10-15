@@ -33,6 +33,16 @@ class MobileControls extends FlxGroup
 		#end
 	}
 
+	/** Keep pause content below the touch overlay. */
+	public static function lastGameCamera():FlxCamera
+	{
+		var result = FlxG.camera;
+		for (camera in FlxG.cameras.list)
+			if (instance == null || camera != instance.hud)
+				result = camera;
+		return result;
+	}
+
 	public static function check(button:Int, edge:Int = 0):Bool
 	{
 		if (instance == null)
@@ -87,7 +97,8 @@ class MobileControls extends FlxGroup
 		{
 			surface = current;
 			blocked = [
-				for (touch in FlxG.touches.list) if (touch.pressed && !touch.justPressed) touch.touchPointID
+				for (touch in FlxG.touches.list)
+					if (touch.pressed && !touch.justPressed) touch.touchPointID
 			];
 			held = [false, false, false, false, false, false, false];
 		}
