@@ -38,7 +38,7 @@ bash scripts/setup-android.sh
 export ANDROID_SETUP=true
 export ANDROID_SDK="$ANDROID_HOME"
 export ANDROID_NDK_ROOT="$ANDROID_HOME/ndk/21.4.7075529"
-haxelib run lime build android -debug -D HXCPP_ARM64
+haxelib run lime build android -debug -DHXCPP_ARM64
 ```
 
 Replays em arquivos e mods externos via Polymod ficam restritos ao desktop.
